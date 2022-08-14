@@ -51,6 +51,14 @@ void eeconfig_init_user(void) {  // EEPROM is getting reset!
  *               └──────┴──────┴──────┴──────┴──────┘  └──────┴──────┴──────┴──────┴──────┘
  */
 
+const key_override_t f5_key_override = ko_make_basic(MOD_MASK_SHIFT, KC_F5, KC_F3);
+
+// This globally defines all key overrides to be used
+const key_override_t **key_overrides = (const key_override_t *[]){
+    &f5_key_override,
+    NULL // Null terminate the array of overrides!
+};
+
 // Defines names for use in layer keycodes and the keymap
 enum layer_names {
     _QWERTY,
