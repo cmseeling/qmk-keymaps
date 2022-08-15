@@ -85,14 +85,16 @@ void TD_SHFT_finished(qk_tap_dance_state_t *state, void *user_data);
 void TD_SHFT_reset(qk_tap_dance_state_t *state, void *user_data);
 void TD_LAYR_finished(qk_tap_dance_state_t *state, void *user_data);
 
-const key_override_t home_key_override = ko_make_basic(MOD_MASK_SHIFT, KC_HOME, KC_END);
-const key_override_t f5_key_override = ko_make_basic(MOD_MASK_SHIFT, KC_F5, KC_F1);
-const key_override_t f6_key_override = ko_make_basic(MOD_MASK_SHIFT, KC_F6, KC_F12);
+const key_override_t home_key_override = ko_make_basic(MOD_MASK_CTRL, KC_HOME, KC_END);
+const key_override_t f5_key_override = ko_make_basic(MOD_MASK_SHIFT, KC_F5, KC_F12);
+const key_override_t f5_second_override = ko_make_basic(MOD_MASK_CTRL, KC_F5, KC_F3);
+const key_override_t f6_key_override = ko_make_basic(MOD_MASK_SHIFT, KC_F6, KC_F1);
 
 // This globally defines all key overrides to be used
 const key_override_t **key_overrides = (const key_override_t *[]){
     &home_key_override,
     &f5_key_override,
+    &f5_second_override,
     &f6_key_override,
     NULL // Null terminate the array of overrides!
 };
@@ -111,7 +113,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_TAB,      KC_Q,    KC_W,       KC_E,    KC_R,    KC_T,    KC_LBRC,                  KC_MINS,     KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_BSLS,
         TD(TD_SHFT), KC_A,    KC_S,       KC_D,    KC_F,    KC_G,    KC_LPRN,                  KC_MINS,     KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,
         KC_LSFT,     KC_Z,    KC_X,       KC_C,    KC_V,    KC_B,    KC_LCBR,                  KC_EQL,      KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_RSHIFT,
-        KC_LCTL,     KC_LGUI, TD(TD_ALT), KC_LBRC, KC_RBRC,  KC_SPC,  KC_F5, KC_F6,   KC_BSPC, TD(TD_GRV),  KC_ENT,  KC_LEFT, KC_UP,   KC_DOWN, KC_RGHT, TD(TD_LAYR),
+        KC_LCTL,     KC_LGUI, TD(TD_ALT), KC_LBRC, KC_RBRC,  KC_SPC,  KC_F6, KC_F5,   KC_BSPC, TD(TD_GRV),  KC_ENT,  KC_LEFT, KC_UP,   KC_DOWN, KC_RGHT, TD(TD_LAYR),
 
         KC_VOLD, KC_VOLU, KC_VOLD, KC_VOLU, KC_VOLD, KC_VOLU,                                     KC_VOLD, KC_VOLU, KC_VOLD, KC_VOLU, KC_VOLD, KC_VOLU,
         KC_DOWN, KC_UP,   KC_RGHT, KC_HOME, KC_LEFT,                                                       KC_VOLD, KC_VOLU, KC_MNXT, KC_MPLY, KC_MPRV
@@ -139,20 +141,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         _______, _______, _______, _______, _______,                                                       _______, _______, _______, _______, _______
     ),
 };
-
-
-void render_layer_status(void) {
-    // Host Keyboard Layer Status
-    oled_write_P(PSTR("Layer"), false);
-    switch (get_highest_layer(layer_state)) {
-        case _QWERTY:
-            oled_write_ln_P(PSTR("QWRTY"), false);
-            break;
-        case _NAV:
-            oled_write_ln_P(PSTR("Nav"), false);
-            break;
-    }
-}
 
 // Determine the tapdance state to return
 uint8_t cur_dance(qk_tap_dance_state_t *state) {
@@ -262,7 +250,7 @@ void TD_LAYR_finished(qk_tap_dance_state_t *state, void *user_data) {
                 rgblight_increase_hue_noeeprom();
                 rgblight_increase_hue_noeeprom();
             }
-            layer_on(2);
+            layer_on(_RGB);
             break;
     }
 }
@@ -274,3 +262,53 @@ qk_tap_dance_action_t tap_dance_actions[] = {
     [TD_SHFT] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, TD_SHFT_finished, TD_SHFT_reset),
     [TD_LAYR] = ACTION_TAP_DANCE_FN(TD_LAYR_finished)
 };
+
+static void render_cat(void) {
+    static const char PROGMEM sleepy_cat[] = {
+        // 'sleepy_cat', 32x32px
+        0x00, 0x00, 0x00, 0x04, 0x84, 0x54, 0x24, 0x54, 0x0c, 0x04, 0x00, 0x00, 0x80, 0x80, 0x80, 0x80, 
+        0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+        0x00, 0x00, 0x00, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x00, 0x80, 0x44, 0x24, 0xc6, 0x85, 
+        0x84, 0x80, 0xe0, 0x20, 0x10, 0x08, 0xf0, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+        0x00, 0x00, 0x00, 0xe0, 0x10, 0x0c, 0x02, 0x02, 0x01, 0x7d, 0x83, 0x00, 0x80, 0x80, 0x80, 0x01, 
+        0x02, 0x03, 0x00, 0x00, 0x00, 0x80, 0x41, 0x02, 0xfd, 0x1e, 0xe0, 0x00, 0x00, 0x00, 0x00, 0x00, 
+        0x00, 0x00, 0x00, 0x07, 0x08, 0x10, 0x10, 0x10, 0x10, 0x10, 0x33, 0x24, 0x28, 0x28, 0x28, 0x29, 
+        0x29, 0x3a, 0x18, 0x1c, 0x39, 0x24, 0x24, 0x3a, 0x2d, 0x26, 0x31, 0x1f, 0x00, 0x00, 0x00, 0x00
+    };
+
+    oled_write_raw_P(sleepy_cat, sizeof(sleepy_cat));
+}
+
+void render_lock_status(void)
+{
+    led_t led_state = host_keyboard_led_state();
+    oled_write_ln_P(  led_state.caps_lock ? PSTR("Caps ") : PSTR("     "), false);
+    oled_write_ln_P(   led_state.num_lock ? PSTR("Nmlck") : PSTR("     "), false);
+    oled_write_ln_P(led_state.scroll_lock ? PSTR("Scrol") : PSTR("     "), false);
+}
+
+bool oled_task_user(void) {
+    oled_clear();
+    render_icon();
+    oled_write_ln_P(PSTR("     "), false);
+
+    switch (get_highest_layer(layer_state)) {
+        case _QWERTY:
+            oled_write_ln_P(PSTR("Qwrty"), false);
+            render_lock_status();
+            oled_write_ln_P(PSTR("     "), false);
+            render_cat();
+            break;
+        case _NAV:
+            oled_write_ln_P(PSTR("Nav  "), false);
+            render_lock_status();
+            oled_write_ln_P(PSTR("     "), false);
+            render_cat();
+            break;
+        case _RGB:
+            render_rgb_menu();
+            break;
+    }
+
+    return false;
+}
